@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Flask</title>
+</head>
+<body>
+    <h1 style="text-align: center">Welcome to Flask</h1>
+    <p style="text-align: center">This is a simple Flask application.</p>
+
+    <div class="container">
+        <input type="file" name="file" id="fileInput" required>
+        <button type="button" onclick="uploadFile()">Upload to HDFS</button>
+    </div>
+
+    <script>
+        function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const statusDiv = document.getElementById('status');
+            
+            if (!fileInput.files.length) {
+                statusDiv.innerHTML = '<p class="error">请先选择文件</p>';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            statusDiv.innerHTML = '<p>上传中，请稍候...</p>';
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    statusDiv.innerHTML = `<p class="success">${data.message}</p>
+                                          <p>保存路径: ${data.local_path}</p>`;
+                } else {
+                    statusDiv.innerHTML = `<p class="error">${data.error}</p>`;
+                }
+            })
+            .catch(error => {
+                statusDiv.innerHTML = `<p class="error">上传失败: ${error}</p>`;
+            });
+        }
+    </script>
+</body>
+</html>
+
+<style>
+    .container {
+  display: grid;
+  place-items: center;
+  height: 100vh;
+}
+</style>
