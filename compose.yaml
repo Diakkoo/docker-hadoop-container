@@ -1,0 +1,62 @@
+services:
+  flask:
+    image: "flask"
+    container_name: "flask"
+    hostname: "flask"
+    ports:
+      - "5000:5000"
+    networks:
+      hnet:
+        ipv4_address: "172.20.1.4"
+    privileged: true
+    extra_hosts:
+      - "nn:172.20.1.10"
+      - "dn1:172.20.1.11"
+      - "dn2:172.20.1.12"
+
+  nn:
+    image: "hdfs-cluster"
+    container_name: "nn"
+    hostname: "nn"
+    networks:
+      hnet:
+        ipv4_address: "172.20.1.10"
+    privileged: true
+    extra_hosts:
+      - "dn1:172.20.1.11"
+      - "dn2:172.20.1.12"
+      - "flask:172.20.1.4"
+
+  dn1:
+    image: "hdfs-cluster"
+    container_name: "dn1"
+    hostname: "dn1"
+    networks:
+      hnet:
+        ipv4_address: "172.20.1.11"
+    privileged: true
+    extra_hosts:
+      - "nn:172.20.1.10"
+      - "dn2:172.20.1.12"
+      - "flask:172.20.1.4"
+
+  dn2:
+    image: "hdfs-cluster"
+    container_name: "dn2"
+    hostname: "dn2"
+    networks:
+      hnet:
+        ipv4_address: "172.20.1.12"
+    extra_hosts:
+      - "nn:172.20.1.10"
+      - "dn1:172.20.1.11"
+      - "flask:172.20.1.4"
+
+networks:
+  hnet:
+    driver: "bridge"
+    ipam:
+      config:
+        - subnet: "172.20.1.0/24"
+          gateway: "172.20.1.254"
+
