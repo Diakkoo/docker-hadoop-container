@@ -1,15 +1,22 @@
-from flask import Flask, request, jsonify, send_file, render_template
+import random
 import socket
-import requests
 import os
-from hdfs import InsecureClient
+import requests
 import logging
-from io import BytesIO
 import time
+import threading
+from hdfs import InsecureClient
+from flask import Flask, request, jsonify, send_file, render_template
+from io import BytesIO
 
 app = Flask(__name__)
 app.logger.setLevel(logging.INFO)
 
+# ¶¨ÒåÈ«¾Ö±äÁ¿¿ØÖÆÊı¾İÉú³É
+generating_flag = False;
+stop_event = threading.Event()
+
+# ÅäÖÃWebHDFSÁ¬½Ó²ÎÊı
 HDFS_NAMENODE_HOST = os.getenv('HDFS_NAMENODE_HOST', 'nn')
 HDFS_WEB_PORT = os.getenv('HDFS_WEB_PORT', '9870')
 HDFS_RPC_PORT = os.getenv('HDFS_RPC_PORT', '9000')
@@ -21,43 +28,89 @@ hdfs_client = InsecureClient(f'http://{HDFS_NAMENODE_HOST}:{HDFS_WEB_PORT}', use
 def index():
     return render_template("index.html")
 
+'''ºóÌ¨Éú³ÉÊı¾İº¯Êı'''
 
-""" ç”¨ curl -X POST -F "file=@test.txt" http://localhost:5000/upload ä¸Šä¼ æ–‡ä»¶ """
+def generate_data_thread():
+    global generating_flag
+
+    try:
+        with open("//app/generate/data.txt", mode="a") as wrt:
+            ID = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']
+            actionCode = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'l', 'm', 'n', 'o', 'p', 'q']
+
+            while generating_flag and not stop_event.is_set():
+                ip_part = ''.join(random.sample(ID, 4))
+
+                time_part = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                
+                action_elements = random.sample(actionCode, 4)
+                action_part = ''.join(str(x) for x in action_elements)
+
+                g_line = f"{ip_part}  {time_part}  {action_part}\n"
+                wrt.write(g_line)
+                wrt.flush()
+                time.sleep(0.5)
+    except Exception as e:
+        app.logger.error(f"Error in data generation thread: {str(e)}")
+
+''' curl -X GET "http://localhost:5000/generate/1" ¿ªÊ¼Éú³ÉÊı¾İ '''
+''' curl -X GET "http://localhost:5000/generate/2" Í£Ö¹Éú³ÉÊı¾İ '''
+
+@app.route('/generate/<int:trg>', methods=['GET'])
+def generate_data(trg):
+    global generating_flag, stop_event
+
+    if trg == 0:            # Èç¹ûURL´«Èë²ÎÊıÎª0£¬ÉèÖÃÍ£Ö¹ÊÂ¼ş£¬Í£Ö¹Êı¾İÉú³É
+        if generating_flag:
+            generating_flag = False
+            stop_event.set()
+            return jsonify({"status": "data generating stopped"}), 200
+    elif trg == 1:          # Èç¹ûURL´«Èë²ÎÊıÎª1£¬¿ªÊ¼Êı¾İÉú³É
+        if not generating_flag:
+            generating_flag = True
+            stop_event.clear()
+            thread = threading.Thread(target=generate_data_thread)
+            thread.start()
+            return jsonify({"status": "data generating started"}), 200
+    else:
+        return jsonify({"error": "Invalid parameter. Use 1 to start and 0 to stop."}), 400
+
+"""ÉÏ´«ÎÄ¼şµ½ HDFS"""
+""" ÓÃ curl -X POST -F "file=@test.txt" http://localhost:5000/upload ÉÏ´«ÎÄ¼ş """
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    """ä¸Šä¼ æ–‡ä»¶åˆ° HDFS"""
 
-    # æ£€æŸ¥æ˜¯å¦æœ‰æ–‡ä»¶ä¸Šä¼ 
+    # ¼ì²éÊÇ·ñÓĞÎÄ¼şÉÏ´«
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
     
     file = request.files['file']
     
-    # æ£€æŸ¥æ–‡ä»¶å
+    # ¼ì²éÎÄ¼şÃû
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
     
     try:
-        # è·å–æ–‡ä»¶å†…å®¹å¹¶è®¡ç®—å¤§å°
+        # »ñÈ¡ÎÄ¼şÄÚÈİ²¢¼ÆËã´óĞ¡
         file_content = file.read()
         file_size = len(file_content)
         file_stream = BytesIO(file_content)
-        file_filename = f"{int(time.time())}_{file.filename}"  # æ·»åŠ æ—¶é—´æˆ³ä»¥é¿å…æ–‡ä»¶åå†²çª
+        file_filename = f"{int(time.time())}_{file.filename}"  # Ìí¼ÓÊ±¼ä´ÁÒÔ±ÜÃâÎÄ¼şÃû³åÍ»
         
-        # åˆ›å»ºç”¨æˆ·ç›®å½•ï¼ˆå¦‚æœä¸å­˜åœ¨ï¼‰
-        user_dir = f'/home/hadoop/hdfs/name'
+        # ´´½¨ÓÃ»§Ä¿Â¼£¨Èç¹û²»´æÔÚ£©
+        user_dir = f'/home/hadoop/local_input'
         if not hdfs_client.status(user_dir, strict=False):
             hdfs_client.makedirs(user_dir)
             app.logger.info(f"Created HDFS directory: {user_dir}")
         
-        # è®¾ç½® HDFS æ–‡ä»¶è·¯å¾„
+        # ÉèÖÃ HDFS ÎÄ¼şÂ·¾¶
         hdfs_path = f'{user_dir}/{file_filename}'
         
-        # ä¸Šä¼ åˆ° HDFSï¼ˆè¦†ç›–å·²å­˜åœ¨çš„æ–‡ä»¶ï¼‰
+        # ÉÏ´«µ½ HDFS£¨¸²¸ÇÒÑ´æÔÚµÄÎÄ¼ş£©
         hdfs_client.write(hdfs_path, file_stream, overwrite=True)
         
-        # è·å–ä¸Šä¼ åçš„æ–‡ä»¶ä¿¡æ¯
+        # »ñÈ¡ÉÏ´«ºóµÄÎÄ¼şĞÅÏ¢
         file_status = hdfs_client.status(hdfs_path)
         
         return jsonify({
@@ -72,31 +125,31 @@ def upload_file():
         return jsonify({'error': str(e)}), 500
 
 
-""" curl -O -J "http://your-server:5000/download/home/hadoop/hdfs/name/{filename}" """
+""" curl -O -J "http://localhost:5000/download/home/hadoop/hdfs/name/{filename}" """
     
 @app.route('/download/<path:hdfs_path>', methods=['GET'])
 def download_file(hdfs_path):
-    """ä»HDFSä¸‹è½½æ–‡ä»¶åˆ°æœ¬åœ°"""
+    """´ÓHDFSÏÂÔØÎÄ¼şµ½±¾µØ"""
     try:
         if not hdfs_path.startswith('/'):
             hdfs_path = '/' + hdfs_path
 
-        # æ£€æŸ¥æ–‡ä»¶æ˜¯å¦å­˜åœ¨
+        # ¼ì²éÎÄ¼şÊÇ·ñ´æÔÚ
         if not hdfs_client.status(hdfs_path, strict=False):
             return jsonify({'error': f'File not found: {hdfs_path}'}), 404
         
-        # ä»HDFSè¯»å–æ–‡ä»¶å†…å®¹
+        # ´ÓHDFS¶ÁÈ¡ÎÄ¼şÄÚÈİ
         with hdfs_client.read(hdfs_path) as reader:
             file_content = reader.read()
         
-        # åˆ›å»ºå†…å­˜æ–‡ä»¶å¯¹è±¡
+        # ´´½¨ÄÚ´æÎÄ¼ş¶ÔÏó
         file_stream = BytesIO(file_content)
-        file_stream.seek(0)  # é‡ç½®æŒ‡é’ˆä½ç½®
+        file_stream.seek(0)  # ÖØÖÃÖ¸ÕëÎ»ÖÃ
         
-        # è·å–æ–‡ä»¶åç”¨äºä¸‹è½½
+        # »ñÈ¡ÎÄ¼şÃûÓÃÓÚÏÂÔØ
         filename = os.path.basename(hdfs_path)
         
-        # ä½œä¸ºé™„ä»¶å‘é€ç»™å®¢æˆ·ç«¯
+        # ×÷Îª¸½¼ş·¢ËÍ¸ø¿Í»§¶Ë
         return send_file(
             file_stream,
             as_attachment=True,
@@ -111,7 +164,7 @@ def download_file(hdfs_path):
 
 @app.route('/test-webhdfs')
 def test_webhdfs():
-    """æµ‹è¯• WebHDFS è¿æ¥"""
+    """²âÊÔ WebHDFS Á¬½Ó"""
     try:
         url = f'http://{HDFS_NAMENODE_HOST}:{HDFS_WEB_PORT}/webhdfs/v1/?op=LISTSTATUS'
         app.logger.info(f"Testing WebHDFS connection to: {url}")
@@ -133,7 +186,7 @@ def test_webhdfs():
 
 @app.route('/test-rpc')
 def test_rpc():
-    """æµ‹è¯• HDFS RPC è¿æ¥"""
+    """²âÊÔ HDFS RPC Á¬½Ó"""
     try:
         app.logger.info(f"Testing RPC connection to: {HDFS_NAMENODE_HOST}:{HDFS_RPC_PORT}")
         with socket.create_connection((HDFS_NAMENODE_HOST, int(HDFS_RPC_PORT)), timeout=5) as sock:
@@ -153,7 +206,7 @@ def test_rpc():
 
 @app.route('/test-dns')
 def test_dns():
-    """æµ‹è¯• DNS è§£æ"""
+    """²âÊÔ DNS ½âÎö"""
     try:
         app.logger.info(f"Testing DNS resolution for: {HDFS_NAMENODE_HOST}")
         ip = socket.gethostbyname(HDFS_NAMENODE_HOST)
@@ -171,5 +224,4 @@ def test_dns():
         }), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
-
+    app.run(host='0.0.0.0', port=5000, debug=True)

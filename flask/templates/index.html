@@ -13,39 +13,6 @@
         <input type="file" name="file" id="fileInput" required>
         <button type="button" onclick="uploadFile()">Upload to HDFS</button>
     </div>
-
-    <script>
-        function uploadFile() {
-            const fileInput = document.getElementById('fileInput');
-            const statusDiv = document.getElementById('status');
-            
-            if (!fileInput.files.length) {
-                statusDiv.innerHTML = '<p class="error">请先选择文件</p>';
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('file', fileInput.files[0]);
-            statusDiv.innerHTML = '<p>上传中，请稍候...</p>';
-
-            fetch('/upload', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.message) {
-                    statusDiv.innerHTML = `<p class="success">${data.message}</p>
-                                          <p>保存路径: ${data.local_path}</p>`;
-                } else {
-                    statusDiv.innerHTML = `<p class="error">${data.error}</p>`;
-                }
-            })
-            .catch(error => {
-                statusDiv.innerHTML = `<p class="error">上传失败: ${error}</p>`;
-            });
-        }
-    </script>
 </body>
 </html>
 

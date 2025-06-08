@@ -2,7 +2,7 @@
 
 [![State-of-the-art Shitcode](https://img.shields.io/static/v1?label=State-of-the-art&message=Shitcode&color=7B5804)](https://github.com/trekhleb/state-of-the-art-shitcode)
 
-目前hdfs-cluster的镜像体积是**3.22**GB，相比runoob教程的cluster_protocal镜像(6.2GB)，体积减少了**48.6%**。������
+目前hdfs-cluster的镜像体积是**3.22**GB，相比runoob教程的cluster_protocal镜像(6.2GB)，体积减少了**48.6%**。🚀
 
 |    镜像    |优化前|优化后|节省空间|
 |:----------:|:----|:----|:------|
@@ -23,7 +23,7 @@
     flask           latest    5303cfbf82fb   35 hours ago   233MB
     ```
 
-#### Flask 目录结构������
+#### Flask 目录结构🗂️
 ```
 flask/
 ├── app.py
@@ -64,7 +64,7 @@ flask/
 
 ---
 
-### Docker-Compose������️
+### Docker-Compose🖇️
 
 用docker-compose可以批量管理容器集群。
 
@@ -79,6 +79,30 @@ flask/
 
 3. 用`docker ps -a`查看容器是否全部运行。
 
+4. 进入nn容器
+
+    ```bash
+    docker exec -it nn su hadoop
+    ```
+
+5. 初始化hdfs配置
+    
+    ```bash
+    hdfs namenode -format
+    ```
+
+6. 启动HDFS
+
+    ```bash
+    start-dfs.sh
+    ```
+
+7. 如果要更改HDFS配置文件，先停止HDFS
+
+    ```bash
+    stop-dfs.sh
+    ```
+    
 ### 测试连接
 
 - 访问flask前端页面。
