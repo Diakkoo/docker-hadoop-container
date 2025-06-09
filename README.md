@@ -2,28 +2,28 @@
 
 [![State-of-the-art Shitcode](https://img.shields.io/static/v1?label=State-of-the-art&message=Shitcode&color=7B5804)](https://github.com/trekhleb/state-of-the-art-shitcode)
 
-目前hdfs-cluster的镜像体积是**3.22**GB，相比runoob教程的cluster_protocal镜像(6.2GB)，体积减少了**48.6%**。🚀
+So far, the image's size of hdfs-cluster is **3.22GB**, it reduced by **48.6%** than cluster_protocal image from runoob turtorial.🚀
 
-|    镜像    |优化前|优化后|节省空间|
+|    image    |before|after|reduced|
 |:----------:|:----|:----|:------|
 |hdfs-cluster|6.2GB|3.22GB|2.98GB|
 
-## 使用指南
+## Usage
 
 ### Flask Container
 
-1. 将 `flask` 目录拉取到本地后，直接在 `flask` 目录内执行以下命令构建镜像：
+1. After pulling the `flask` directory locally, and then execute the following command in the  `flask` directory to build up image.
     ```bash
     docker build -t flask .
     ```
 
-2. 使用 `docker images` 查看镜像
+2. Execute `docker images` to check out the image.
     ```bash
     REPOSITORY      TAG       IMAGE ID       CREATED        SIZE
     flask           latest    5303cfbf82fb   35 hours ago   233MB
     ```
 
-#### Flask 目录结构🗂️
+#### Structure of Flask Directory🗂️
 ```
 flask/
 ├── app.py
@@ -37,26 +37,26 @@ flask/
 
 ### HDFS-Cluster Container
 
-1. HDFS 容器的搭建参考了 [菜鸟教程 Hadoop 教程](https://www.runoob.com/w3cnote/hadoop-tutorial.html)。由于教程中搭建的镜像体积高达 6.2GB，因此编写了一个 `Dockerfile` 集成全部依赖环境和步骤。减少存储空间占用的同时也更加方便部署。
+1. The HDFS container is references the [菜鸟教程 Hadoop 教程](https://www.runoob.com/w3cnote/hadoop-tutorial.html). The original image size is **6.2GB**. So I wrote a `Dockerfile` by myself to integrate all standard dependent environments and steps, for the purpose of minimizing and convenience. 
+    
+2. Pull the `hdfs_cluster` directory locally.
 
-2. 将 `hdfs_cluster` 目录拉取到本地。
+3. Extract and place the Hadoop **3.3.6** binary file in the `hdfs_cluster` directory.
 
-3. 将Hadoop **3.3.6** 二进制文件解压并放置在 `hdfs_cluster` 目录下。
-
-    官网下载地址：
+    Official website download link：
     [Hadoop 3.3.6 下载地址](https://dlcdn.apache.org/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz)
 
-4. 我已经在 `Dockerfile` 文件中直接将 Hadoop 二进制文件复制到 `/usr/local/hadoop`，以便简化操作并缩减镜像大小：
+4. In the `Dockfile`, I choose to copy the Hadoop binary file in the `/usr/local/hadoop`, which is image's directory, not the .tar.gz archive, with the purpose of simplizing steps and reducing storage usage.
     ```Dockerfile
     COPY hadoop-3.3.6 /usr/local/hadoop
     ```
 
-5. 执行以下命令构建镜像：
+5. Execute the following command to build up image.
     ```bash
     docker build -t hdfs-cluster .
     ```
 
-6. 使用 `docker images` 查看镜像是否构建成功：
+6. Execute command `docker images` to check out the image.
     ```bash
     REPOSITORY      TAG       IMAGE ID       CREATED             SIZE
     hdfs-cluster    latest    3fd30855b0ac   About an hour ago   3.22GB
@@ -66,71 +66,71 @@ flask/
 
 ### Docker-Compose🖇️
 
-用docker-compose可以批量管理容器集群。
+Docker-compose enables centralized management of container cluster.
 
-编写一个`compose.yaml`，搭建falsk-hdfs环境。
+I wrote a `compose.yaml` to set up a hdfs environment.
 
-1. 构建好flask镜像和hdfs-cluster镜像
+1. Before using docker-compose, please be sure the image were built up successfully.
 
-2. 用docker-compose运行容器群
+2. Start the container cluster by docker-compose command.
     ```bash
     docker-compose up
     ```
 
-3. 用`docker ps -a`查看容器是否全部运行。
+3. Execute command `docker ps -a` to check out if all containers are running.
 
-4. 进入nn容器
+4. Enter the `nn` container terminal by docker command.
 
     ```bash
     docker exec -it nn su hadoop
     ```
 
-5. 初始化hdfs配置
+5. Initialize HDFS configuration.
     
     ```bash
     hdfs namenode -format
     ```
 
-6. 启动HDFS
+6. Start HDFS.
 
     ```bash
     start-dfs.sh
     ```
 
-7. 如果要更改HDFS配置文件，先停止HDFS
+7. Stop HDFS before changing configuration
 
     ```bash
     stop-dfs.sh
     ```
     
-### 测试连接
+### Connection Tests
 
-- 访问flask前端页面。
+- Access flask fronted.
 
     ```bash
     curl http://localhost:5000
     ```
 
-- 测试WebHDFS连接。
+- Test WebHDFS connectivity.
 
     ```bash
     curl http://localhost:5000/test-webhdfs
     ```
 
-    预计返回`status: success`
+    Expected respone: `status: success`
 
-- 测试RPC连接。
+- Test RPC connectivity.
 
     ```
     curl http://localhost:5000/test-rpc
     ```
 
-    预计返回`status: success`
+    Expected respone: `status: success`
 
-- 测试DNS解析。
+- Test DNS resolution.
 
     ```
     curl http://localhost:5000/test-dns
     ```
 
-    预计返回结果为namenode容器的IP地址`172.20.1.10`
+    Excepted respone: NameNode container IP address(e.g. `172.20.1.10`)
