@@ -104,7 +104,10 @@ RUN ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa && \
     chmod 600 ~/.ssh/authorized_keys && \
     # 将工作节点添加到Hadoop配置文件中
     echo "dn1" >> $HADOOP_HOME/etc/hadoop/workers && \
-    echo "dn2" >> $HADOOP_HOME/etc/hadoop/workers
+    echo "dn2" >> $HADOOP_HOME/etc/hadoop/workers && \
+    # 将数据节点的公钥添加到认证文件
+    ssh-copy-id hadoop@dn1 && \
+    ssh-copy-id hadoop@dn2
 
 
 USER root
