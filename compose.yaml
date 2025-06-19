@@ -13,9 +13,10 @@ services:
       - "nn:172.20.1.10"
       - "dn1:172.20.1.11"
       - "dn2:172.20.1.12"
+      - "mysql:172.20.1.5"
 
   nn:
-    image: "hdfs-cluster"
+    image: "hadoop-hive"
     container_name: "nn"
     hostname: "nn"
     networks:
@@ -26,6 +27,7 @@ services:
       - "dn1:172.20.1.11"
       - "dn2:172.20.1.12"
       - "flask:172.20.1.4"
+      - "mysql:172.20.1.5"
 
   dn1:
     image: "hdfs-cluster"
@@ -39,6 +41,7 @@ services:
       - "nn:172.20.1.10"
       - "dn2:172.20.1.12"
       - "flask:172.20.1.4"
+      - "mysql:172.20.1.5"
 
   dn2:
     image: "hdfs-cluster"
@@ -50,6 +53,23 @@ services:
     extra_hosts:
       - "nn:172.20.1.10"
       - "dn1:172.20.1.11"
+      - "flask:172.20.1.4"
+      - "mysql:172.20.1.5"
+  
+  mysql:
+    image: "mysql:5.7.37"
+    container_name: "mysql"
+    hostname: "mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+      MYSQL_DATABASE: "hive"
+    networks:
+      hnet:
+        ipv4_address: "172.20.1.5"
+    extra_hosts:
+      - "nn:172.20.1.10"
+      - "dn1:172.20.1.11"
+      - "dn2:172.20.1.12"
       - "flask:172.20.1.4"
 
 networks:
