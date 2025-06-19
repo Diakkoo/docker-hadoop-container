@@ -104,14 +104,12 @@ RUN ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa && \
     chmod 600 ~/.ssh/authorized_keys && \
     # 将工作节点添加到Hadoop配置文件中
     echo "dn1" >> $HADOOP_HOME/etc/hadoop/workers && \
-    echo "dn2" >> $HADOOP_HOME/etc/hadoop/workers && \
-    # 将数据节点的公钥添加到认证文件
-    ssh-copy-id hadoop@dn1 && \
-    ssh-copy-id hadoop@dn2
+    echo "dn2" >> $HADOOP_HOME/etc/hadoop/workers
+
 
 
 USER root
-EXPOSE 22 9870 8088 19888 9864 9866 9867 9868 9000
+EXPOSE 22 9870 8088 19888 9864 9866 9867 9868 9000 10000
 CMD ["/usr/sbin/sshd", "-D"]
 
 
