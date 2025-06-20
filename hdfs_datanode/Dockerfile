@@ -6,10 +6,10 @@ ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
 ENV PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
 
 COPY hadoop-3.3.6 /usr/local/hadoop
+COPY ../ssh_keys/ /home/hadoop/.ssh/
 
 # root用户层
-RUN curl https://repo.huaweicloud.com/repository/conf/CentOS-7-reg.repo -o /etc/yum.repos.d/CentOS-Base.repo && \
-    sed -i 's/mirrors.aliyun.com/mirrors.tuna.tsinghua.edu.cn/g' /etc/yum.repos.d/CentOS-Base.repo && \
+RUN curl https://mirrors.aliyun.com/repo/Centos-7.repo -o /etc/yum.repos.d/CentOS-Base.repo && \
     # 安装JAVA和SSH
     yum makecache && \
     yum install -y \
@@ -37,7 +37,8 @@ RUN curl https://repo.huaweicloud.com/repository/conf/CentOS-7-reg.repo -o /etc/
     # 生成SSH主机密钥
     ssh-keygen -A && \
     mkdir -p /var/run/sshd && \
-    chmod 755 /var/run/sshd
+    chmod 755 /var/run/sshd && \
+    chown -R hadoop /home/hadoop/
 
 # 配置core-site.xml
 RUN cat > $HADOOP_HOME/etc/hadoop/core-site.xml <<'EOF'
@@ -94,14 +95,12 @@ USER hadoop
 WORKDIR /home/hadoop
 
 # hadoop用户层
-# 生成用户RSA密钥对，将公钥添加到认证文件
-# 用该镜像同时运行多个数据节点，
-# 节点的公钥都已经添加到认证文件中，
-# 各节点互信
-RUN ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa && \
-    cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && \
+# 修复命令行提示符
+RUN cp /etc/skel/.bash* ~/ && \
+    echo "export PS1='[\u@\h \W]\$ '" >> ~/.bashrc && \
+    echo "source /etc/profile" >> ~/.bashrc && \
     chmod 700 ~/.ssh  && \
-    chmod 600 ~/.ssh/authorized_keys && \
+    chmod 600 ~/.ssh/* && \
     # 将工作节点添加到Hadoop配置文件中
     echo "dn1" >> $HADOOP_HOME/etc/hadoop/workers && \
     echo "dn2" >> $HADOOP_HOME/etc/hadoop/workers
