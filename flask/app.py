@@ -5,6 +5,7 @@ import requests
 import logging
 import time
 import threading
+import csv
 from hdfs import InsecureClient
 from flask import Flask, request, jsonify, send_file, render_template
 from io import BytesIO
@@ -34,27 +35,42 @@ def generate_data_thread():
     global generating_flag
 
     try:
-        with open("//app/generate/data.txt", mode="a") as wrt:
-            ID = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']
+        with open("/app/generate/data.csv", mode="a") as wrt:
+            ID = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
             actionCode = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'l', 'm', 'n', 'o', 'p', 'q']
 
             while generating_flag and not stop_event.is_set():
-                ip_part = ''.join(random.sample(ID, 4))
+                ip_part = ''.join(map(str, random.sample(ID, 6)))
 
-                time_part = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                date_part = time.strftime("%Y-%m-%d", time.localtime())
+                time_part = time.strftime("%H:%M:%S", time.localtime())
                 
                 action_elements = random.sample(actionCode, 4)
                 action_part = ''.join(str(x) for x in action_elements)
 
-                g_line = f"{ip_part}  {time_part}  {action_part}\n"
-                wrt.write(g_line)
+                resource_part = random.randint(0, 9999999)
+                if_returned = random.choice([True, False])
+                if if_returned:
+                    returned_resource = random.randint(0, 9999999)
+                else:
+                    returned_resource = 0
+
+                wrt_csv = csv.writer(wrt)
+                wrt_csv.writerow([
+                    ip_part,
+                    date_part,
+                    time_part,
+                    action_part,
+                    resource_part,
+                    if_returned,
+                    returned_resource])
                 wrt.flush()
-                time.sleep(0.5)
+                time.sleep(0.1)
     except Exception as e:
         app.logger.error(f"Error in data generation thread: {str(e)}")
 
 ''' curl -X GET "http://localhost:5000/generate/1" 开始生成数据 '''
-''' curl -X GET "http://localhost:5000/generate/2" 停止生成数据 '''
+''' curl -X GET "http://localhost:5000/generate/0" 停止生成数据 '''
 
 @app.route('/generate/<int:trg>', methods=['GET'])
 def generate_data(trg):
