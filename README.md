@@ -18,7 +18,7 @@ The image's size of hadoop-base is **3.22GB**, it reduced by **48.6%** than clus
 
 [Hive 4.0.1](https://dlcdn.apache.org/hive/hive-4.0.1/apache-hive-4.0.1-bin.tar.gz)
 
-[mysql-connector-java-5.1.49](https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.49.tar.gz)
+[MySQL-Connector-JAVA-5.1.49](https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.49.tar.gz)
 
 ## Usage
 

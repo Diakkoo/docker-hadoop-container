@@ -21,6 +21,10 @@
     <value>hdfs://nn:9000/user/hive/warehouse</value>
   </property>
   <property>
+  <name>hive.metastore.uris</name>
+  <value>thrift://nn:9083</value>
+  </property>
+  <property>
     <name>hive.server2.enable.dsAs</name>
       <value>false</value>
   </property>
@@ -31,6 +35,10 @@
   <property>
     <name>hive.server2.thrift.port</name>
     <value>10000</value>
+  </property>
+  <property>
+    <name>hive.server2.webui.port</name>
+    <value>10002</value>
   </property>
   <property>
     <name>hive.exec.local.scratchdir</name>
