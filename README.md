@@ -195,7 +195,7 @@ I wrote a `compose.yaml` to set up a hdfs environment.
     pkill -f "hive --service hiveserver2"
     ```
 
-4. Enter Hive CLI
+4. Enter Hive JDBC(Beeline) CLI
 
     ```
     beeline -u "jdbc:hive2://localhost:10000/default" -n hadoop

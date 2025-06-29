@@ -13,6 +13,7 @@ services:
       - "nn:172.20.1.10"
       - "dn1:172.20.1.11"
       - "dn2:172.20.1.12"
+      - "dn3:172.20.1.13"
       - "mysql:172.20.1.5"
 
   nn:
@@ -26,11 +27,12 @@ services:
     extra_hosts:
       - "dn1:172.20.1.11"
       - "dn2:172.20.1.12"
+      - "dn3:172.20.1.13"
       - "flask:172.20.1.4"
       - "mysql:172.20.1.5"
 
   dn1:
-    image: "hdfs-cluster"
+    image: "hadoop-base"
     container_name: "dn1"
     hostname: "dn1"
     networks:
@@ -40,11 +42,12 @@ services:
     extra_hosts:
       - "nn:172.20.1.10"
       - "dn2:172.20.1.12"
+      - "dn3:172.20.1.13"
       - "flask:172.20.1.4"
       - "mysql:172.20.1.5"
 
   dn2:
-    image: "hdfs-cluster"
+    image: "hadoop-base"
     container_name: "dn2"
     hostname: "dn2"
     networks:
@@ -53,6 +56,21 @@ services:
     extra_hosts:
       - "nn:172.20.1.10"
       - "dn1:172.20.1.11"
+      - "dn3:172.20.1.13"
+      - "flask:172.20.1.4"
+      - "mysql:172.20.1.5"
+    
+  dn3:
+    image: "hadoop-base"
+    container_name: "dn3"
+    hostname: "dn3"
+    networks:
+      hnet:
+        ipv4_address: "172.20.1.13"
+    extra_hosts:
+      - "nn:172.20.1.10"
+      - "dn1:172.20.1.11"
+      - "dn2:172.20.1.12"
       - "flask:172.20.1.4"
       - "mysql:172.20.1.5"
   
@@ -70,6 +88,7 @@ services:
       - "nn:172.20.1.10"
       - "dn1:172.20.1.11"
       - "dn2:172.20.1.12"
+      - "dn3:172.20.1.13"
       - "flask:172.20.1.4"
 
 networks:

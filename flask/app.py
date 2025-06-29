@@ -33,9 +33,9 @@ def index():
 
 def generate_data_thread():
     global generating_flag
-
+    # time_stamp = f"{int(time.time())}"
     try:
-        with open("/app/generate/data.csv", mode="a") as wrt:
+        with open(f"/app/generate/data.csv", mode="a") as wrt:
             ID = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
             actionCode = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'l', 'm', 'n', 'o', 'p', 'q']
 
@@ -48,10 +48,10 @@ def generate_data_thread():
                 action_elements = random.sample(actionCode, 4)
                 action_part = ''.join(str(x) for x in action_elements)
 
-                resource_part = random.randint(0, 9999999)
+                resource_part = random.randint(-9999, 9999999)
                 if_returned = random.choice([True, False])
                 if if_returned:
-                    returned_resource = random.randint(0, 9999999)
+                    returned_resource = random.randint(1, resource_part)
                 else:
                     returned_resource = 0
 
