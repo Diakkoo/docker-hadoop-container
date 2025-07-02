@@ -8,6 +8,13 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
+/*
+ * UV统计
+ * 统计每天的独立用户访问量
+ * 返回结果格式为：
+ * <日期> <独立用户数>
+ */
+
 public class UVStatisticsDriver {
 
     public static void main(String[] args) throws Exception {

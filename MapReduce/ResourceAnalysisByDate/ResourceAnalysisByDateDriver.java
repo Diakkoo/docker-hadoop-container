@@ -7,6 +7,12 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
+/* 
+ * 根据日期对资源使用情况进行分析
+ * 返回结果格式为：
+ * <日期> <总使用量> <总归还量>
+*/
+
 public class ResourceAnalysisByDateDriver {
     public static void main(String[] args) throws Exception {
         System.out.println("=== check out ===");

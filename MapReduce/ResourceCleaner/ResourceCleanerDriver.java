@@ -7,6 +7,11 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
+/*
+ * 对资源进行清理
+ * 将使用资源量小于返还资源量的记录过滤
+ */
+
 public class ResourceCleanerDriver {
 
     public static void main(String[] args) throws Exception {
