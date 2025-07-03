@@ -8,7 +8,7 @@ upload_bp = Blueprint('upload', __name__)
 """上传文件到 HDFS"""
 """ 用 curl -X POST -F "file=@test.txt" http://localhost:5000/upload 上传文件 """
 
-@upload_bp.route('/', methods=['POST'])
+@upload_bp.route('', methods=['POST'])
 def upload_file():
     global HDFS_CLIENT
 

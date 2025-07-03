@@ -20,7 +20,7 @@ def test_webhdfs():
             "service": "WebHDFS",
             "endpoint": url,
             "response_code": response.status_code,
-            "response_text": response
+            "response_text": response.text
         }
         ),200
     except Exception as e:
