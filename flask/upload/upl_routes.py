@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from io import BytesIO
 from conf import HDFS_CLIENT
 import time
@@ -8,7 +8,7 @@ upload_bp = Blueprint('upload', __name__)
 """上传文件到 HDFS"""
 """ 用 curl -X POST -F "file=@test.txt" http://localhost:5000/upload 上传文件 """
 
-@upload_bp.route('/upload', methods=['POST'])
+@upload_bp.route('/', methods=['POST'])
 def upload_file():
     global HDFS_CLIENT
 
@@ -40,7 +40,7 @@ def upload_file():
         remote_dir = '/remote_input'
         if not HDFS_CLIENT.status(remote_dir, strict = False):
             HDFS_CLIENT.makedirs(remote_dir)
-            upload_bp.logger.info(f"Created HDFS directory: {remote_dir}")
+            current_app.logger.info(f"Created HDFS directory: {remote_dir}")
         
         # 设置 HDFS 文件路径
         hdfs_path = f"{remote_dir}/{file_filename}"
@@ -61,7 +61,7 @@ def upload_file():
             }
         ), 200
     except Exception as e:
-        upload_bp.logger.error(f"Upload failed: {str(e)}")
+        current_app.logger.error(f"Upload failed: {str(e)}")
         return jsonify(
             {
                 "error": str(e)

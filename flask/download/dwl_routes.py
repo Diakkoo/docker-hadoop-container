@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, send_file
+from flask import Blueprint, jsonify, send_file, current_app
 from conf import HDFS_CLIENT
 from io import BytesIO
 import os
@@ -8,7 +8,7 @@ download_bp = Blueprint('download', __name__)
 """从HDFS下载文件到本地"""
 """ curl -O -J "http://localhost:5000/download/home/hadoop/hdfs/name/{filename}" """
 
-@download_bp.route('/download/<path:hdfs_path>', methods = ['GET'])
+@download_bp.route('/<path:hdfs_path>', methods = ['GET'])
 def download_file(hdfs_path):
     global HDFS_CLIENT
 
@@ -43,7 +43,7 @@ def download_file(hdfs_path):
             mimetype='application/octet-stream'
         )
     except Exception as e:
-        download_bp.logger.error(f"Download failed for {hdfs_path}: {str(e)}")
+        current_app.logger.error(f"Download failed for {hdfs_path}: {str(e)}")
         return jsonify(
             {
                 'error': f'Download failed: {str(e)}'

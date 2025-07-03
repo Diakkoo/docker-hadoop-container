@@ -5,7 +5,7 @@ import socket
 
 connection_bp = Blueprint('connection', __name__)
 
-@connection_bp.route('/connection/test-webhdfs')
+@connection_bp.route('/test-webhdfs')
 def test_webhdfs():
     global HDFS_NAMENODE_HOST, HDFS_WEB_PORT
 
@@ -32,7 +32,7 @@ def test_webhdfs():
         }
         ), 500
     
-@connection_bp.route('/connection/test-rpc')
+@connection_bp.route('/test-rpc')
 def test_rpc():
     global HDFS_NAMENODE_HOST, HDFS_RPC_PORT
 
@@ -54,7 +54,7 @@ def test_rpc():
             "error": str(e)
         }), 500
     
-@connection_bp.route('/connection/test-dns')
+@connection_bp.route('/test-dns')
 def test_dns():
     global HDFS_NAMENODE_HOST
 

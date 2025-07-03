@@ -2,7 +2,7 @@ import time
 import threading
 import csv
 import random
-from flask import jsonify, Blueprint
+from flask import jsonify, Blueprint, current_app
 
 generate_bp = Blueprint('generate', __name__)
 
@@ -47,11 +47,11 @@ def generate_data_thread():
                 wrt.flush()
                 time.sleep(0.05)
     except Exception as e:
-        generate_bp.logger.error(f"Error in data generation thread: {str(e)}")
+        current_app.logger.error(f"Error in data generation thread: {str(e)}")
 
 ''' curl -X GET "http://localhost:5000/generate/1" 开始生成数据 '''
 ''' curl -X GET "http://localhost:5000/generate/0" 停止生成数据 '''
-@generate_bp.route('/generate/<int:trg>', methods=['GET'])
+@generate_bp.route('/<int:trg>', methods=['GET'])
 def generate_data(trg):
     global generating_flag, stop_event
 
