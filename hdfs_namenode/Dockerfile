@@ -84,10 +84,10 @@ RUN cat > $HADOOP_HOME/etc/hadoop/hdfs-site.xml <<'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 <configuration>
-    <!-- 每个数据块复制 4 份存储 -->
+    <!-- 每个数据块复制 5 份存储 -->
     <property>
         <name>dfs.replication</name>
-        <value>4</value>
+        <value>5</value>
     </property>
     <!-- 设置储存命名信息的目录 -->
     <property>
@@ -125,7 +125,8 @@ RUN cp /etc/skel/.bash* ~/ && \
     # 将工作节点添加到Hadoop配置文件中
     echo "dn1" >> $HADOOP_HOME/etc/hadoop/workers && \
     echo "dn2" >> $HADOOP_HOME/etc/hadoop/workers && \
-    echo "dn3" >> $HADOOP_HOME/etc/hadoop/workers
+    echo "dn3" >> $HADOOP_HOME/etc/hadoop/workers && \
+    echo "dn4" >> $HADOOP_HOME/etc/hadoop/workers
 
 
 USER root
