@@ -3,7 +3,6 @@ import threading
 import csv
 import random
 from flask import jsonify, Blueprint
-import logging
 
 generate_bp = Blueprint('generate', __name__)
 

@@ -1,8 +1,7 @@
-from flask import Blueprint, jsonify
-from app import HDFS_NAMENODE_HOST, HDFS_WEB_PORT, HDFS_RPC_PORT, HDFS_USER
+from flask import Blueprint, jsonify, current_app
+from conf import HDFS_NAMENODE_HOST, HDFS_WEB_PORT, HDFS_RPC_PORT, HDFS_USER
 import requests
 import socket
-import logging
 
 connection_bp = Blueprint('connection', __name__)
 
@@ -13,7 +12,7 @@ def test_webhdfs():
     """ 测试 WebHDFS 连接 """
     try:
         url = f'http://{HDFS_NAMENODE_HOST}:{HDFS_WEB_PORT}/webhdfs/v1/?op=LISTSTATUS'
-        connection_bp.logger.info(f"Testing WebHDFS connection to: {HDFS_NAMENODE_HOST}:{HDFS_WEB_PORT}")
+        current_app.logger.info(f"Testing WebHDFS connection to: {HDFS_NAMENODE_HOST}:{HDFS_WEB_PORT}")
         response = requests.get(url, timeout = 10)
         return jsonify(
             {

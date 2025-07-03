@@ -1,8 +1,7 @@
 from flask import Blueprint, jsonify, request
 from io import BytesIO
-from app import HDFS_CLIENT
+from conf import HDFS_CLIENT
 import time
-import logging
 
 upload_bp = Blueprint('upload', __name__)
 

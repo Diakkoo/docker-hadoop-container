@@ -1,8 +1,7 @@
 from flask import Blueprint, jsonify, send_file
-from app import HDFS_CLIENT
+from conf import HDFS_CLIENT
 from io import BytesIO
 import os
-import logging
 
 download_bp = Blueprint('download', __name__)
 

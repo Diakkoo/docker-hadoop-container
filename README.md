@@ -39,6 +39,7 @@ The image's size of hadoop-base is **3.22GB**, it reduced by **48.6%** than clus
 ```
 flask/
     ├── app.py
+    ├── conf.py
     ├── connection/
     |   ├── __init__.py
     |   └── conn_routes.py
