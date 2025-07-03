@@ -24,7 +24,7 @@ def test_webhdfs():
         }
         ),200
     except Exception as e:
-        connection_bp.logger.error(f"WebHDFS connection faild: {str(e)}")
+        current_app.logger.error(f"WebHDFS connection faild: {str(e)}")
         return jsonify(
             {"status": 'error',
              "service": "WebHDFS",
@@ -38,7 +38,7 @@ def test_rpc():
 
     """ 测试 HDFS RPC 连接 """
     try:
-        connection_bp.logger.info(f"Testing RPC connection to: {HDFS_NAMENODE_HOST}:{HDFS_RPC_PORT}")
+        current_app.logger.info(f"Testing RPC connection to: {HDFS_NAMENODE_HOST}:{HDFS_RPC_PORT}")
         with socket.create_connection((HDFS_NAMENODE_HOST, int(HDFS_RPC_PORT)), timeout=5) as sock:
             return jsonify({
                 "status": "success",
@@ -47,7 +47,7 @@ def test_rpc():
                 "message": "TCP connection established"
             }), 200
     except Exception as e:
-        connection_bp.logger.error(f"RPC connection failed: {str(e)}")
+        current_app.logger.error(f"RPC connection failed: {str(e)}")
         return jsonify({
             "status": "error",
             "service": "HDFS RPC",
@@ -60,7 +60,7 @@ def test_dns():
 
     """" 测试 DNS 解析 """
     try:
-        connection_bp.logger.info(f"Testing DNS resolution for: {HDFS_NAMENODE_HOST}")
+        current_app.logger.info(f"Testing DNS resolution for: {HDFS_NAMENODE_HOST}")
         ip = socket.gethostbyname(HDFS_NAMENODE_HOST)
         return jsonify({
             "status": "success",
@@ -68,7 +68,7 @@ def test_dns():
             "resolved_ip": ip
         }), 200
     except Exception as e:
-        connection_bp.logger.error(f"DNS resolution failed: {str(e)}")
+        current_app.logger.error(f"DNS resolution failed: {str(e)}")
         return jsonify({
             "status": "error",
             "host": HDFS_NAMENODE_HOST,
