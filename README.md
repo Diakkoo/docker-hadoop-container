@@ -2,11 +2,11 @@
 
 [![State-of-the-art Shitcode](https://img.shields.io/static/v1?label=State-of-the-art&message=Shitcode&color=7B5804)](https://github.com/trekhleb/state-of-the-art-shitcode)
 
+[简体中文](./README_zh.md)|English
+
 **Docker-Compose ---> Flask + Haoop + Hive + MySQL**
 
-
-
-The image's size of hadoop-base is **3.22GB**, it reduced by **48.6%** than cluster_protocal image from runoob turtorial.🚀
+The image's size of hadoop-base is **3.22GB**, it reduced by **48.6%** than cluster_protocal image from runoob turtorial. 🚀
 
 |    Image    |Before|After|Reduced|
 |:----------:|:----|:----|:------|
@@ -18,7 +18,7 @@ The image's size of hadoop-base is **3.22GB**, it reduced by **48.6%** than clus
 
 [Hive 3.1.2](https://dlcdn.apache.org/hive/hive-4.0.1/apache-hive-4.0.1-bin.tar.gz)
 
-[MySQL-Connector-JAVA-5.1.49](https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.49.tar.gz)
+[MySQL-Connector-Java-5.1.49](https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.49.tar.gz)
 
 ## Usage
 
@@ -35,7 +35,8 @@ The image's size of hadoop-base is **3.22GB**, it reduced by **48.6%** than clus
     flask           latest    5303cfbf82fb   35 hours ago   233MB
     ```
 
-#### Structure of Flask Directory🗂️
+#### Structure of Flask Directory 🗂️
+
 ```
 flask/
     ├── app.py
@@ -64,7 +65,7 @@ flask/
 
 The HDFS container is references the [菜鸟教程 Hadoop 教程](https://www.runoob.com/w3cnote/hadoop-tutorial.html). The original image size is **6.2GB**. So I wrote a `Dockerfile` by myself to integrate all standard dependent environments and steps, for the purpose of minimizing and convenience. 
 
-#### Structure of Hdfs_Datanode Directory🗂️
+#### Structure of Hdfs_Datanode Directory 🗂️
 
 To build up image, the structure should include following resources: 
 
@@ -106,7 +107,7 @@ hdfs_datanode/
 
 ### Hadoop-Hive Container as Namenode
 
-#### Structure of Hdfs_Datanode Directory🗂️
+#### Structure of Hdfs_Datanode Directory 🗂️
 
 To build up image, the structure should include following resources: 
 
@@ -139,7 +140,7 @@ docker build -t hadoop-base .
 
 ---
 
-### Docker-Compose🖇️
+### Docker-Compose 🖇️
 
 Docker-compose enables centralized management of container cluster.
 
