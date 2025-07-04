@@ -70,8 +70,8 @@ public class ActionSequenceCountDriver {
             System.out.println("\nProcessing Report:");
             System.out.println("Total input records: " + inputRecords);
             System.out.println("Valid records processed: " + validRecords);
-            System.out.println("Records with '01' sequence: " + sequenceFound);
-            System.out.println("Records without '01' sequence: " + (validRecords - sequenceFound));
+            System.out.println("Records with '" + ActionSequenceCountMapper.getTARGET_SEQUENCE() + "' sequence: %n" + sequenceFound);
+            System.out.println("Records without '" + ActionSequenceCountMapper.getTARGET_SEQUENCE() + "' sequence: " + (validRecords - sequenceFound));
         }
 
         System.exit(success ? 0 : 1);

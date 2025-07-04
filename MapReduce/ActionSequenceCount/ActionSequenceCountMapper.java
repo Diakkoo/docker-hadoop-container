@@ -73,4 +73,8 @@ public class ActionSequenceCountMapper extends Mapper<LongWritable, Text, Text, 
             context.getCounter("STAT", "SEQUENCE_01L_FOUND").increment(1);
         }
     }
+
+    protected static String getTARGET_SEQUENCE() {
+        return TARGET_SEQUENCE;
+    }
 }

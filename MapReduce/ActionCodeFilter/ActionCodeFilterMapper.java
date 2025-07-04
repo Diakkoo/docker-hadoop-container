@@ -60,4 +60,7 @@ public class ActionCodeFilterMapper extends Mapper<LongWritable, Text, Text, Tex
             context.getCounter("STAT", "SEQUENCE_01_FOUND").increment(1);
         }
     }
+    protected static String getTARGET_SEQUENCE() {
+        return TARGET_SEQUENCE;
+    }
 }

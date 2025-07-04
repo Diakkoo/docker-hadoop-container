@@ -71,7 +71,7 @@ public class ActionCodeFilterDriver {
             System.out.println("\nFilter Report:");
             System.out.println("Total input records: " + inputRecords);
             System.out.println("Valid records processed: " + validRecords);
-            System.out.println("Records with '01' sequence: " + outputRecords);
+            System.out.println("Records with '" + ActionCodeFilterMapper.getTARGET_SEQUENCE() + "' sequence: " + outputRecords);
         }
 
         System.exit(success ? 0 : 1);
