@@ -4,7 +4,7 @@
 
 [简体中文](./README_zh.md) | English
 
-**Docker-Compose ---> Flask + Haoop + Hive + MySQL**
+**Docker-Compose ---> Flask + Haoop + Hive + MySQL + YARN**
 
 The image's size of hadoop-base is **3.22GB** (v0.1.0), it reduced by **48.6%** than cluster_protocal image from runoob turtorial. 🚀
 
@@ -129,6 +129,7 @@ hdfs_namenode/
             │   ├── mysql-connector-java-5.1.49.jar
             |   └── ......
             ├── hive-site.xml
+            ├── fair-scheduler.xml
             └── Dockerfile
 ```
 
