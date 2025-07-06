@@ -21,6 +21,9 @@ services:
     image: "hadoop-hive"
     container_name: "nn"
     hostname: "nn"
+    ports:
+      - "9870:9870"
+      - "8088:8088"
     networks:
       hnet:
         ipv4_address: "172.20.1.10"

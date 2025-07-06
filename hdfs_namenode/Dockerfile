@@ -112,6 +112,153 @@ RUN cat > $HADOOP_HOME/etc/hadoop/hdfs-site.xml <<'EOF'
 </configuration>
 EOF
 
+# 配置mapred-site.xml
+RUN cat > $HADOOP_HOME/etc/hadoop/mapred-site.xml <<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+    <!-- 指定MapReduce运行框架为YARN -->
+    <property>
+        <name>mapreduce.framework.name</name>
+        <value>yarn</value>
+    </property>
+    
+    <!-- 设置MapReduce应用程序的类路径 -->
+    <property>
+        <name>mapreduce.application.classpath</name>
+        <value>
+            $HADOOP_HOME/share/hadoop/mapreduce/*,
+            $HADOOP_HOME/share/hadoop/mapreduce/lib/*,
+            $HADOOP_HOME/share/hadoop/common/*,
+            $HADOOP_HOME/share/hadoop/common/lib/*,
+            $HADOOP_HOME/share/hadoop/yarn/*,
+            $HADOOP_HOME/share/hadoop/yarn/lib/*
+        </value>
+    </property>
+    
+    <!-- 设置Application Master的环境变量 -->
+    <property>
+        <name>yarn.app.mapreduce.am.env</name>
+        <value>HADOOP_MAPRED_HOME=$HADOOP_HOME</value>
+    </property>
+    
+    <!-- 设置Map任务的环境变量 -->
+    <property>
+        <name>mapreduce.map.env</name>
+        <value>HADOOP_MAPRED_HOME=$HADOOP_HOME</value>
+    </property>
+    
+    <!-- 设置Reduce任务的环境变量 -->
+    <property>
+        <name>mapreduce.reduce.env</name>
+        <value>HADOOP_MAPRED_HOME=$HADOOP_HOME</value>
+    </property>
+    
+    <!-- 设置Application Master的内存限制为512MB -->
+    <property>
+        <name>yarn.app.mapreduce.am.resource.mb</name>
+        <value>512</value>
+    </property>
+    
+    <!-- 设置每个Map任务的内存限制为512MB -->
+    <property>
+        <name>mapreduce.map.memory.mb</name>
+        <value>512</value>
+    </property>
+    
+    <!-- 设置每个Reduce任务的内存限制为512MB -->
+    <property>
+        <name>mapreduce.reduce.memory.mb</name>
+        <value>512</value>
+    </property>
+</configuration>
+EOF
+
+# 配置yarn-site.xml
+RUN cat > $HADOOP_HOME/etc/hadoop/yarn-site.xml <<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+    <!-- 指定NodeManager的辅助服务为mapreduce_shuffle -->
+    <property>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce_shuffle</value>
+    </property>
+    
+    <!-- 指定shuffle处理的类 -->
+    <property>
+        <name>yarn.nodemanager.aux-services.mapreduce_shuffle.class</name>
+        <value>org.apache.hadoop.mapred.ShuffleHandler</value>
+    </property>
+    
+    <!-- 指定ResourceManager的主机名 -->
+    <property>
+        <name>yarn.resourcemanager.hostname</name>
+        <value>nn</value>
+    </property>
+    
+    <!-- ResourceManager与客户端通信的地址 -->
+    <property>
+        <name>yarn.resourcemanager.address</name>
+        <value>nn:8032</value>
+    </property>
+    
+    <!-- ResourceManager与调度器通信的地址 -->
+    <property>
+        <name>yarn.resourcemanager.scheduler.address</name>
+        <value>nn:8030</value>
+    </property>
+    
+    <!-- ResourceManager与NodeManager通信的地址 -->
+    <property>
+        <name>yarn.resourcemanager.resource-tracker.address</name>
+        <value>nn:8031</value>
+    </property>
+    
+    <!-- ResourceManager管理接口地址 -->
+    <property>
+        <name>yarn.resourcemanager.admin.address</name>
+        <value>nn:8033</value>
+    </property>
+    
+    <!-- ResourceManager Web UI地址 -->
+    <property>
+        <name>yarn.resourcemanager.webapp.address</name>
+        <value>nn:8088</value>
+    </property>
+    
+    <!-- 每个NodeManager可用的物理内存量，设置为512MB -->
+    <property>
+        <name>yarn.nodemanager.resource.memory-mb</name>
+        <value>512</value>
+    </property>
+    
+    <!-- 单个容器可申请的最小内存量，设置为256MB -->
+    <property>
+        <name>yarn.scheduler.minimum-allocation-mb</name>
+        <value>256</value>
+    </property>
+    
+    <!-- 单个容器可申请的最大内存量，设置为512MB -->
+    <property>
+        <name>yarn.scheduler.maximum-allocation-mb</name>
+        <value>512</value>
+    </property>
+    
+    <!-- 关闭虚拟内存检查，避免因虚拟内存限制导致任务失败 -->
+    <property>
+        <name>yarn.nodemanager.vmem-check-enabled</name>
+        <value>false</value>
+    </property>
+    
+    <!-- 设置每个容器可用的虚拟内存与物理内存的比例 -->
+    <property>
+        <name>yarn.nodemanager.vmem-pmem-ratio</name>
+        <value>2.1</value>
+    </property>
+</configuration>
+EOF
+
 USER hadoop
 WORKDIR /home/hadoop
 
@@ -130,7 +277,7 @@ RUN cp /etc/skel/.bash* ~/ && \
 
 
 USER root
-EXPOSE 22 9870 8088 19888 9864 9866 9867 9868 9000 10000 9083
+EXPOSE 22 9870 8088 19888 9864 9866 9867 9868 9000 10000 8042 8030 8031 8032 8033
 CMD ["/usr/sbin/sshd", "-D"]
 
 

@@ -2,11 +2,11 @@
 
 [![State-of-the-art Shitcode](https://img.shields.io/static/v1?label=State-of-the-art&message=Shitcode&color=7B5804)](https://github.com/trekhleb/state-of-the-art-shitcode)
 
-[简体中文](./README_zh.md)|English
+[简体中文](./README_zh.md) | English
 
 **Docker-Compose ---> Flask + Haoop + Hive + MySQL**
 
-The image's size of hadoop-base is **3.22GB**, it reduced by **48.6%** than cluster_protocal image from runoob turtorial. 🚀
+The image's size of hadoop-base is **3.22GB** (v0.1.0), it reduced by **48.6%** than cluster_protocal image from runoob turtorial. 🚀
 
 |    Image    |Before|After|Reduced|
 |:----------:|:----|:----|:------|
@@ -216,6 +216,19 @@ I wrote a `compose.yaml` to set up a hdfs environment.
 
     ```
     beeline -u "jdbc:hive2://localhost:10000/default" -n hadoop
+    ```
+    
+#### Start YARN
+
+1. Start YARN
+    ```
+    start-yarn.sh
+    ```
+
+2. Check the status of ResourceManager
+
+    ```
+    yarn node -list
     ```
     
 ### Connection Tests

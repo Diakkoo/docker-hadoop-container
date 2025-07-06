@@ -2,11 +2,11 @@
 
 [![State-of-the-art Shitcode](https://img.shields.io/static/v1?label=State-of-the-art&message=Shitcode&color=7B5804)](https://github.com/trekhleb/state-of-the-art-shitcode)
 
-简体中文|[English](./README.md)
+简体中文 | [English](./README.md)
 
 **Docker-Compose ---> Flask + Hadoop + Hive + MySQL**
 
-hadoop-base 镜像的大小为 **3.22GB**，相比 runoob 教程中的 cluster_protocal 镜像减少了 **48.6%** 🚀
+hadoop-base 镜像的大小为 **3.22GB** （v0.1.0），相比 runoob 教程中的 cluster_protocal 镜像减少了 **48.6%** 🚀
 
 |    镜像    |优化前|优化后|减少量|
 |:----------:|:----|:----|:------|
@@ -219,6 +219,19 @@ Docker-compose 用于集中管理容器集群
 
     ```
     beeline -u "jdbc:hive2://localhost:10000/default" -n hadoop
+    ```
+    
+#### 启动 YARN
+
+1. 启动 YARN
+    ```
+    start-yarn.sh
+    ```
+
+2. 检查 ResourceManager 状态
+
+    ```
+    yarn node -list
     ```
     
 ### 连接测试
