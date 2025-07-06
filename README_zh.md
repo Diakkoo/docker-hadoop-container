@@ -220,8 +220,26 @@ Docker-compose 用于集中管理容器集群
     ```
     beeline -u "jdbc:hive2://localhost:10000/default" -n hadoop
     ```
-    
+
 #### 启动 YARN
+
+基于8GB内存的测试环境处理10GB以内的数据量，HDFS集群内存分配最佳方案：<br>
+每个NodeManager可用内存：1.5GB <br>
+每个NodeManager的vCPU数量：1 <br>
+每个Map任务内存：1GB <br>
+每个Reduce任务内存：1GB <br>
+Application Master内存：1GB <br>
+数据副本数量：2 <br>
+
+```
+宿主机8GB
+├─ 系统保留: 2GB
+└─ 可用：6GB
+   ├─ dn1: 1.5GB (YARN + DataNode)
+   ├─ dn2: 1.5GB (YARN + DataNode)
+   ├─ dn3: 1.5GB (YARN + DataNode)
+   └─ dn4: 1.5GB (YARN + DataNode)
+```
 
 1. 启动 YARN
     ```

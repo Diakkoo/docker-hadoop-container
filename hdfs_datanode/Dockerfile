@@ -63,11 +63,19 @@ RUN cat > $HADOOP_HOME/etc/hadoop/hdfs-site.xml <<'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 <configuration>
-    <!-- 每个数据块复制 5 份存储 -->
+    <!-- 每个数据块复制 2 份存储 -->
     <property>
         <name>dfs.replication</name>
-        <value>5</value>
+        <value>2</value>
     </property>
+
+    <!-- 增加DataNode处理线程数 -->
+    <!-- 默认10会占用过多内存 -->
+    <property>
+      <name>dfs.datanode.handler.count</name>
+      <value>4</value>
+    </property>
+
     <!-- 设置储存命名信息的目录 -->
     <property>
         <name>dfs.namenode.name.dir</name>
@@ -133,22 +141,32 @@ RUN cat > $HADOOP_HOME/etc/hadoop/mapred-site.xml <<'EOF'
         <value>HADOOP_MAPRED_HOME=$HADOOP_HOME</value>
     </property>
     
-    <!-- 设置Application Master的内存限制为512MB -->
+    <!-- 设置Application Master的内存限制为1GB -->
     <property>
         <name>yarn.app.mapreduce.am.resource.mb</name>
-        <value>512</value>
+        <value>1024</value>
     </property>
     
-    <!-- 设置每个Map任务的内存限制为512MB -->
+    <!-- 设置每个Map任务的内存限制为1GB -->
     <property>
         <name>mapreduce.map.memory.mb</name>
-        <value>512</value>
+        <value>1024</value>
     </property>
     
-    <!-- 设置每个Reduce任务的内存限制为512MB -->
+    <!-- 设置每个Reduce任务的内存限制为1.5GB -->
     <property>
         <name>mapreduce.reduce.memory.mb</name>
-        <value>512</value>
+        <value>1536</value>
+    </property>
+
+    <!-- Map/Reduce任务的JVM堆内存(设为容器(8GB)的80%) -->
+    <property>
+        <name>mapreduce.map.java.opts</name>
+        <value>-Xmx819m</value>  <!-- 1024MB * 0.8 -->
+    </property>
+    <property>
+        <name>mapreduce.reduce.java.opts</name>
+        <value>-Xmx1228m</value> <!-- 1536MB * 0.8 -->
     </property>
 </configuration>
 EOF
@@ -206,19 +224,19 @@ RUN cat > $HADOOP_HOME/etc/hadoop/yarn-site.xml <<'EOF'
         <value>nn:8088</value>
     </property>
     
-    <!-- 每个NodeManager可用的物理内存量，设置为512MB -->
+    <!-- 每个NodeManager可用的物理内存量设置为1.5GB -->
     <property>
         <name>yarn.nodemanager.resource.memory-mb</name>
+        <value>1536</value>
+    </property>
+    
+    <!-- 单个容器可申请的最小内存量设置为512MB -->
+    <property>
+        <name>yarn.scheduler.minimum-allocation-mb</name>
         <value>512</value>
     </property>
     
-    <!-- 单个容器可申请的最小内存量，设置为256MB -->
-    <property>
-        <name>yarn.scheduler.minimum-allocation-mb</name>
-        <value>256</value>
-    </property>
-    
-    <!-- 单个容器可申请的最大内存量，设置为512MB -->
+    <!-- 单个容器可申请的最大内存量设置为1.5GB -->
     <property>
         <name>yarn.scheduler.maximum-allocation-mb</name>
         <value>512</value>
@@ -230,10 +248,10 @@ RUN cat > $HADOOP_HOME/etc/hadoop/yarn-site.xml <<'EOF'
         <value>false</value>
     </property>
     
-    <!-- 设置每个容器可用的虚拟内存与物理内存的比例 -->
+    <!-- 设置每个容器可用的vCPU核数 -->
     <property>
-        <name>yarn.nodemanager.vmem-pmem-ratio</name>
-        <value>2.1</value>
+        <name>yarn.nodemanager.resource.cpu-vorces</name>
+        <value>1</value>
     </property>
 </configuration>
 EOF

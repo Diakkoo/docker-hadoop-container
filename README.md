@@ -220,6 +220,24 @@ I wrote a `compose.yaml` to set up a hdfs environment.
     
 #### Start YARN
 
+The optimal solution for HDFS cluster memory allocation is to process data volumes up to 10GB in a testing environment based on 8GB of memory:<br>
+Available memory for every NodeManager : 1.5GB <br>
+Number of vCPUs for Every NodeManager: 1 <br>
+Memory for each Map task: 1GB <br>
+Memory for each Reduce task: 1GB <br>
+Memory for Application Master: 1GB <br>
+Numbers of data replication: 2 <br>
+
+```
+Host 8GB
+├─ System Reserverd: 2GB
+└─ Available: 6GB
+   ├─ dn1: 1.5GB (YARN + DataNode)
+   ├─ dn2: 1.5GB (YARN + DataNode)
+   ├─ dn3: 1.5GB (YARN + DataNode)
+   └─ dn4: 1.5GB (YARN + DataNode)
+```
+
 1. Start YARN
     ```
     start-yarn.sh
