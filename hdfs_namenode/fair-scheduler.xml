@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<allocations>
+  <!-- 默认队列配置 -->
+  <queue name="default">
+    <minResources>2048 mb,2 vcores</minResources> <!-- 最小资源保障 -->
+    <maxResources>6144 mb,6 vcores</maxResources> <!-- 最大资源限制 -->
+    <weight>1.0</weight>                         <!-- 队列权重 -->
+    <schedulingPolicy>fair</schedulingPolicy>    <!-- 公平策略 -->
+    <aclSubmitApps>*</aclSubmitApps>             <!-- 允许所有用户提交 -->
+  </queue>
+
+  <!-- 强制任务均匀分布的全局设置 -->
+  <defaultQueueSchedulingPolicy>fair</defaultQueueSchedulingPolicy>
+  <queuePlacementPolicy>
+    <rule name="specified" create="false"/>      <!-- 禁止自动创建队列 -->
+    <rule name="default" queue="default"/>       <!-- 所有任务进入default队列 -->
+  </queuePlacementPolicy>
+
+  <!-- 节点级资源限制（避免单节点过载） -->
+  <nodeResources>
+    <resource name="memory-mb">1536</resource>   <!-- 每个NodeManager可用内存 -->
+    <resource name="vcores">2</resource>         <!-- 每个NodeManager可用vCores -->
+  </nodeResources>
+</allocations>

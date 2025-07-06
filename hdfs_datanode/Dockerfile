@@ -147,16 +147,16 @@ RUN cat > $HADOOP_HOME/etc/hadoop/mapred-site.xml <<'EOF'
         <value>1024</value>
     </property>
     
-    <!-- 设置每个Map任务的内存限制为1GB -->
+    <!-- 设置每个Map任务的内存限制为762MB -->
     <property>
         <name>mapreduce.map.memory.mb</name>
-        <value>1024</value>
+        <value>762</value>
     </property>
     
-    <!-- 设置每个Reduce任务的内存限制为1.5GB -->
+    <!-- 设置每个Reduce任务的内存限制为512MB -->
     <property>
         <name>mapreduce.reduce.memory.mb</name>
-        <value>1536</value>
+        <value>512</value>
     </property>
 
     <!-- Map/Reduce任务的JVM堆内存(设为容器(8GB)的80%) -->
@@ -224,10 +224,10 @@ RUN cat > $HADOOP_HOME/etc/hadoop/yarn-site.xml <<'EOF'
         <value>nn:8088</value>
     </property>
     
-    <!-- 每个NodeManager可用的物理内存量设置为1.5GB -->
+    <!-- 每个NodeManager可用的物理内存量设置为1.2GB -->
     <property>
         <name>yarn.nodemanager.resource.memory-mb</name>
-        <value>1536</value>
+        <value>1228</value>
     </property>
     
     <!-- 单个容器可申请的最小内存量设置为512MB -->
@@ -236,10 +236,10 @@ RUN cat > $HADOOP_HOME/etc/hadoop/yarn-site.xml <<'EOF'
         <value>512</value>
     </property>
     
-    <!-- 单个容器可申请的最大内存量设置为1.5GB -->
+    <!-- 单个容器可申请的最大内存量设置为1.0GB -->
     <property>
         <name>yarn.scheduler.maximum-allocation-mb</name>
-        <value>512</value>
+        <value>1024</value>
     </property>
     
     <!-- 关闭虚拟内存检查，避免因虚拟内存限制导致任务失败 -->
@@ -252,6 +252,20 @@ RUN cat > $HADOOP_HOME/etc/hadoop/yarn-site.xml <<'EOF'
     <property>
         <name>yarn.nodemanager.resource.cpu-vorces</name>
         <value>1</value>
+    </property>
+        <property>
+        <name>yarn.resourcemanager.scheduler.class</name>
+        <value>org.apache.hadoop.yarn.server.resourcemanager.scheduler.fair.FairScheduler</value>
+    </property>
+    <property>
+    <!-- 调度策略文件路径 -->
+        <name>yarn.scheduler.fair.allocation.file</name>
+        <value>/usr/local/hadoop/etc/hadoop/fair-scheduler.xml</value>
+    </property>
+    <property>
+    <!-- 启用资源抢占 -->
+        <name>yarn.scheduler.fair.preemption</name>
+        <value>true</value>
     </property>
 </configuration>
 EOF
