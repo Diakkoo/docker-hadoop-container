@@ -52,7 +52,9 @@ RUN curl https://mirrors.aliyun.com/repo/Centos-7.repo -o /etc/yum.repos.d/CentO
     ssh-keygen -A && \
     mkdir -p /var/run/sshd && \
     chmod 755 /var/run/sshd && \
-    chown -R hadoop /home/hadoop/
+    chown -R hadoop /home/hadoop/ && \
+    # 删除workers文件中的localhost记录
+    if [ -f "$HADOOP_HOME/etc/hadoop/workers" ]; then sed -i '1{/^localhost$/d}' "$HADOOP_HOME/etc/hadoop/workers"; fi
 
 # 配置core-site.xml
 RUN cat > $HADOOP_HOME/etc/hadoop/core-site.xml <<'EOF'
@@ -64,18 +66,11 @@ RUN cat > $HADOOP_HOME/etc/hadoop/core-site.xml <<'EOF'
         <name>fs.defaultFS</name>
         <value>hdfs://nn:9000</value>
     </property>
+
     <!-- 配置 Hadoop 的临时文件目录 -->
     <property>
         <name>hadoop.tmp.dir</name>
         <value>file:///home/hadoop/tmp</value>
-    </property>
-    <property>
-      <name>hadoop.proxyuser.hadoop.groups</name>
-        <value>*</value>
-    </property>
-    <property>
-        <name>hadoop.proxyuser.hadoop.hosts</name>
-        <value>*</value>
     </property>
 </configuration>
 EOF
@@ -103,20 +98,29 @@ RUN cat > $HADOOP_HOME/etc/hadoop/hdfs-site.xml <<'EOF'
         <name>dfs.namenode.name.dir</name>
         <value>file:///home/hadoop/hdfs/name</value>
     </property>
+
     <!-- 设置数据节点数据目录 -->
     <property>
         <name>dfs.datanode.data.dir</name>
         <value>file:///home/hadoop/hdfs/data</value>
     </property>
+
     <!-- 设置Web UI端口 -->
     <property>
         <name>dfs.namenode.http-address</name>
         <value>nn:9870</value>
     </property>
+
     <!-- 开启WebHDFS -->
     <property>
         <name>dfs.webhdfs.enabled</name>
         <value>true</value>
+    </property>
+
+    <!-- hdfs 块大小 -->
+    <property>
+      <name>dfs.blocksize</name>
+      <value>536870912</value> <!-- 512MB -->
     </property>
 </configuration>
 EOF
@@ -144,51 +148,81 @@ RUN cat > $HADOOP_HOME/etc/hadoop/mapred-site.xml <<'EOF'
             $HADOOP_HOME/share/hadoop/yarn/lib/*
         </value>
     </property>
-    
+
     <!-- 设置Application Master的环境变量 -->
     <property>
         <name>yarn.app.mapreduce.am.env</name>
         <value>HADOOP_MAPRED_HOME=$HADOOP_HOME</value>
     </property>
-    
+
     <!-- 设置Map任务的环境变量 -->
     <property>
         <name>mapreduce.map.env</name>
         <value>HADOOP_MAPRED_HOME=$HADOOP_HOME</value>
     </property>
-    
+
     <!-- 设置Reduce任务的环境变量 -->
     <property>
         <name>mapreduce.reduce.env</name>
         <value>HADOOP_MAPRED_HOME=$HADOOP_HOME</value>
     </property>
-    
+
     <!-- 设置Application Master的内存限制为1GB -->
     <property>
         <name>yarn.app.mapreduce.am.resource.mb</name>
-        <value>1024</value>
+        <value>512</value>
     </property>
-    
+
+    <property>
+        <name>mapreduce.am.command-opts</name>
+        <value>-Xmx410m</value>
+    </property>
+
     <!-- 设置每个Map任务的内存限制为762MB -->
     <property>
         <name>mapreduce.map.memory.mb</name>
         <value>762</value>
     </property>
-    
-    <!-- 设置每个Reduce任务的内存限制为512MB -->
+
+    <!-- 设置每个Reduce任务的内存限制为762MB -->
     <property>
         <name>mapreduce.reduce.memory.mb</name>
-        <value>512</value>
+        <value>762</value>
     </property>
 
-    <!-- Map/Reduce任务的JVM堆内存(设为容器(8GB)的80%) -->
+    <!-- 限制并行任务数 -->
     <property>
-        <name>mapreduce.map.java.opts</name>
-        <value>-Xmx819m</value>  <!-- 1024MB * 0.8 -->
+      <name>mapreduce.job.maps</name>
+      <value>1</value>
     </property>
+
     <property>
-        <name>mapreduce.reduce.java.opts</name>
-        <value>-Xmx1228m</value> <!-- 1536MB * 0.8 -->
+      <name>mapreduce.job.reduces</name>
+      <value>1</value>
+    </property>
+
+    <!-- 设置Reduce任务启动阈值 -->
+    <property>
+      <name>mapreduce.reduce.slowstart.completedmaps</name>
+      <value>1</value>
+    </property>
+    
+    <!-- 禁止Reduce阶段抢占资源 -->
+    <property>
+      <name>mapreduce.job.reduce.slowstart.completedmaps</name>
+      <value>1</value>
+    </property>
+
+    <!-- 防止ResourceManager过早调度Reduce -->
+    <property>
+      <name>yarn.app.mapreduce.am.job.reduce.rampup.limit</name>
+      <value>0</value>  <!-- 完全禁用Reduce预热 -->
+    </property>
+    
+    <!-- 确保Map任务优先获取资源 -->
+    <property>
+      <name>mapreduce.job.reduce.slowstart.completedmaps</name>
+      <value>1</value>
     </property>
 </configuration>
 EOF
@@ -246,19 +280,19 @@ RUN cat > $HADOOP_HOME/etc/hadoop/yarn-site.xml <<'EOF'
         <value>nn:8088</value>
     </property>
     
-    <!-- 每个NodeManager可用的物理内存量设置为1.2GB -->
+    <!-- 每个NodeManager可用的物理内存量设置为1024MB -->
     <property>
         <name>yarn.nodemanager.resource.memory-mb</name>
-        <value>1228</value>
+        <value>1024</value>
     </property>
     
-    <!-- 单个容器可申请的最小内存量设置为512MB -->
+    <!-- 单个容器可申请的最小内存量设置为1024MB -->
     <property>
         <name>yarn.scheduler.minimum-allocation-mb</name>
-        <value>512</value>
+        <value>1024</value>
     </property>
     
-    <!-- 单个容器可申请的最大内存量设置为1.0GB -->
+    <!-- 单个容器可申请的最大内存量设置为1024MB -->
     <property>
         <name>yarn.scheduler.maximum-allocation-mb</name>
         <value>1024</value>
@@ -275,19 +309,33 @@ RUN cat > $HADOOP_HOME/etc/hadoop/yarn-site.xml <<'EOF'
         <name>yarn.nodemanager.resource.cpu-vorces</name>
         <value>1</value>
     </property>
+
     <property>
         <name>yarn.resourcemanager.scheduler.class</name>
         <value>org.apache.hadoop.yarn.server.resourcemanager.scheduler.fair.FairScheduler</value>
     </property>
+
     <property>
     <!-- 调度策略文件路径 -->
         <name>yarn.scheduler.fair.allocation.file</name>
         <value>/usr/local/hadoop/etc/hadoop/fair-scheduler.xml</value>
     </property>
+
     <property>
     <!-- 启用资源抢占 -->
         <name>yarn.scheduler.fair.preemption</name>
         <value>true</value>
+    </property>
+
+    <!-- 增加心跳超时阈值 -->
+    <property>
+      <name>yarn.nodemanager.heartbeat.interval-ms</name>
+      <value>10000</value>  <!-- 默认1000ms改为10秒 -->
+    </property>
+    
+    <property>
+      <name>yarn.resourcemanager.nm.liveness-monitor.expiry-interval-ms</name>
+      <value>60000</value>  <!-- 默认600000ms改为1分钟 -->
     </property>
 </configuration>
 EOF
@@ -304,9 +352,7 @@ RUN cp /etc/skel/.bash* ~/ && \
     chmod 600 ~/.ssh/authorized_keys && \
     # 将工作节点添加到Hadoop配置文件中
     echo "dn1" >> $HADOOP_HOME/etc/hadoop/workers && \
-    echo "dn2" >> $HADOOP_HOME/etc/hadoop/workers && \
-    echo "dn3" >> $HADOOP_HOME/etc/hadoop/workers && \
-    echo "dn4" >> $HADOOP_HOME/etc/hadoop/workers
+    echo "dn2" >> $HADOOP_HOME/etc/hadoop/workers
 
 
 USER root

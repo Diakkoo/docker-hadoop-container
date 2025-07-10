@@ -13,8 +13,6 @@ services:
       - "nn:172.20.1.10"
       - "dn1:172.20.1.11"
       - "dn2:172.20.1.12"
-      - "dn3:172.20.1.13"
-      - "dn4:172.20.1.14"
       - "mysql:172.20.1.5"
 
   nn:
@@ -31,14 +29,12 @@ services:
     extra_hosts:
       - "dn1:172.20.1.11"
       - "dn2:172.20.1.12"
-      - "dn3:172.20.1.13"
-      - "dn4:172.20.1.14"
       - "flask:172.20.1.4"
       - "mysql:172.20.1.5"
     deploy:
       resources:
         limits:
-          memory: 1.5G
+          memory: 2.5G
 
   dn1:
     image: "hadoop-base"
@@ -51,14 +47,12 @@ services:
     extra_hosts:
       - "nn:172.20.1.10"
       - "dn2:172.20.1.12"
-      - "dn3:172.20.1.13"
-      - "dn4:172.20.1.14"
       - "flask:172.20.1.4"
       - "mysql:172.20.1.5"
     deploy:
       resources:
         limits:
-          memory: 1.5G
+          memory: 2.5G
 
   dn2:
     image: "hadoop-base"
@@ -70,52 +64,12 @@ services:
     extra_hosts:
       - "nn:172.20.1.10"
       - "dn1:172.20.1.11"
-      - "dn3:172.20.1.13"
-      - "dn4:172.20.1.14"
       - "flask:172.20.1.4"
       - "mysql:172.20.1.5"
     deploy:
       resources:
         limits:
-          memory: 1.5G
-
-  dn3:
-    image: "hadoop-base"
-    container_name: "dn3"
-    hostname: "dn3"
-    networks:
-      hnet:
-        ipv4_address: "172.20.1.13"
-    extra_hosts:
-      - "nn:172.20.1.10"
-      - "dn1:172.20.1.11"
-      - "dn2:172.20.1.12"
-      - "dn4:172.20.1.14"
-      - "flask:172.20.1.4"
-      - "mysql:172.20.1.5"
-    deploy:
-      resources:
-        limits:
-          memory: 1.5G
-
-  dn4:
-    image: "hadoop-base"
-    container_name: "dn4"
-    hostname: "dn4"
-    networks:
-      hnet:
-        ipv4_address: "172.20.1.14"
-    extra_hosts:
-      - "nn:172.20.1.10"
-      - "dn1:172.20.1.11"
-      - "dn2:172.20.1.12"
-      - "dn3:172.20.1.13"
-      - "flask:172.20.1.4"
-      - "mysql:172.20.1.5"
-    deploy:
-      resources:
-        limits:
-          memory: 1.5G
+          memory: 2.5G
 
   mysql:
     image: "mysql:5.7.37"
@@ -131,8 +85,6 @@ services:
       - "nn:172.20.1.10"
       - "dn1:172.20.1.11"
       - "dn2:172.20.1.12"
-      - "dn3:172.20.1.13"
-      - "dn4:172.20.1.14"
       - "flask:172.20.1.4"
 
 networks:
