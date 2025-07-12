@@ -61,60 +61,17 @@ flask/
 
 ---
 
-### Hadoop-Base 容器作为 Datanode
+### HDFS-Node 容器作为 Namenode, Datanode
 
 HDFS 容器参考了 [菜鸟教程 Hadoop 教程](https://www.runoob.com/w3cnote/hadoop-tutorial.html)原始镜像大小为 **6.2GB**因此，我编写了一个 `Dockerfile`，集成了所有标准依赖环境和步骤，以实现最小化和便利性
 
-#### Hdfs_Datanode 目录结构 🗂️
+#### hdfs_node 目录结构 🗂️
 
 构建镜像时，目录结构应包括以下资源：
 
 
 ```
-hdfs_datanode/
-            ├── ssh_keys/
-            |   ├── id_rsa
-            |   ├── id_rsa.pub
-            |   └── authorized_keys
-            ├── hadoop-3.3.6/
-            │   ├── bin/
-            |   ├── etc/
-            |   └── ......
-            └── Dockerfile
-```
-    
-1. 拉取 'hdfs_datanode' 目录到本地
-
-2. 解压并将 Hadoop **3.3.6** 二进制文件放置到 `hdfs_datanode` 目录中
-
-    官方网站下载链接：
-    [Hadoop 3.3.6 下载地址](https://dlcdn.apache.org/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz)
-
-3. 在 `Dockerfile` 中，我选择将 Hadoop 二进制文件复制到镜像目录 `/usr/local/hadoop`，而不是 .tar.gz 压缩包，以简化步骤并减少存储使用
-    ```Dockerfile
-    COPY hadoop-3.3.6 /usr/local/hadoop
-    ```
-
-4. 执行以下命令构建镜像
-    ```
-    docker build -t hadoop-base .
-    ```
-
-5. 执行命令 `docker images` 查看镜像
-    ```
-    REPOSITORY      TAG       IMAGE ID       CREATED             SIZE
-    hadoop-base    latest    3fd30855b0ac   About an hour ago   3.22GB
-    ```
-
-### Hadoop-Hive 容器作为 Namenode
-
-#### Hdfs_Namenode 目录结构 🗂️
-
-构建镜像时，目录结构应包括以下资源：
-
-
-```
-hdfs_namenode/
+hdfs_node/
             ├── ssh_keys/
             |   ├── id_rsa
             |   ├── id_rsa.pub
@@ -134,12 +91,29 @@ hdfs_namenode/
             ├── fair-scheduler.xml
             └── Dockerfile
 ```
+    
+1. 拉取 'hdfs_node' 目录到本地
 
-执行以下命令构建镜像
+2. 解压并将 Hadoop **3.3.6** 二进制文件放置到 `hdfs_node` 目录中
 
-```
-docker build -t hadoop-base .
-```
+    官方网站下载链接：
+    [Hadoop 3.3.6 下载地址](https://dlcdn.apache.org/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz)
+
+3. 在 `Dockerfile` 中，我选择将 Hadoop 二进制文件复制到镜像目录 `/usr/local/hadoop`，而不是 .tar.gz 压缩包，以简化步骤并减少存储使用
+    ```Dockerfile
+    COPY hadoop-3.3.6 /usr/local/hadoop
+    ```
+
+4. 执行以下命令构建镜像
+    ```
+    docker build -t hdfs-node .
+    ```
+
+5. 执行命令 `docker images` 查看镜像
+    ```
+    REPOSITORY      TAG       IMAGE ID       CREATED             SIZE
+    hdfs_node    latest    3fd30855b0ac   About an hour ago   3.22GB
+    ```
 
 ---
 

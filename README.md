@@ -61,7 +61,7 @@ flask/
 
 ---
 
-### Hadoop-Base Container as Datanode
+### HDFS_Node Container as Namenode, Datanode
 
 The HDFS container is references the [菜鸟教程 Hadoop 教程](https://www.runoob.com/w3cnote/hadoop-tutorial.html). The original image size is **6.2GB**. So I wrote a `Dockerfile` by myself to integrate all standard dependent environments and steps, for the purpose of minimizing and convenience. 
 
@@ -70,49 +70,7 @@ The HDFS container is references the [菜鸟教程 Hadoop 教程](https://www.ru
 To build up image, the structure should include following resources: 
 
 ```
-hdfs_datanode/
-            ├── ssh_keys/
-            |   ├── id_rsa
-            |   ├── id_rsa.pub
-            |   └── authorized_keys
-            ├── hadoop-3.3.6/
-            │   ├── bin/
-            |   ├── etc/
-            |   └── ......
-            └── Dockerfile
-```
-    
-1. Pull the `hdfs_datanode` directory locally.
-
-2. Extract and place the Hadoop **3.3.6** binary file in the `hdfs_datanode` directory.
-
-    Official website download link：
-    [Hadoop 3.3.6 下载地址](https://dlcdn.apache.org/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz)
-
-3. In the `Dockfile`, I choose to copy the Hadoop binary file in the `/usr/local/hadoop`, which is image's directory, not the .tar.gz archive, with the purpose of simplizing steps and reducing storage usage.
-    ```Dockerfile
-    COPY hadoop-3.3.6 /usr/local/hadoop
-    ```
-
-4. Execute the following command to build up image.
-    ```bash
-    docker build -t hadoop-base .
-    ```
-
-5. Execute command `docker images` to check out the image.
-    ```bash
-    REPOSITORY      TAG       IMAGE ID       CREATED             SIZE
-    hadoop-base    latest    3fd30855b0ac   About an hour ago   3.22GB
-    ```
-
-### Hadoop-Hive Container as Namenode
-
-#### Structure of Hdfs_Datanode Directory 🗂️
-
-To build up image, the structure should include following resources: 
-
-```
-hdfs_namenode/
+hdfs_node/
             ├── ssh_keys/
             |   ├── id_rsa
             |   ├── id_rsa.pub
@@ -132,12 +90,29 @@ hdfs_namenode/
             ├── fair-scheduler.xml
             └── Dockerfile
 ```
+    
+1. Pull the `hdfs_node` directory locally.
 
-Execute the following command to build up image.
+2. Extract and place the Hadoop **3.3.6** binary file in the `hdfs_node` directory.
 
-```bash
-docker build -t hadoop-base .
-```
+    Official website download link：
+    [Hadoop 3.3.6 下载地址](https://dlcdn.apache.org/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz)
+
+3. In the `Dockfile`, I choose to copy the Hadoop binary file in the `/usr/local/hadoop`, which is image's directory, not the .tar.gz archive, with the purpose of simplizing steps and reducing storage usage.
+    ```Dockerfile
+    COPY hadoop-3.3.6 /usr/local/hadoop
+    ```
+
+4. Execute the following command to build up image.
+    ```bash
+    docker build -t hdfs_node .
+    ```
+
+5. Execute command `docker images` to check out the image.
+    ```bash
+    REPOSITORY      TAG       IMAGE ID       CREATED             SIZE
+    hdfs_node    latest    3fd30855b0ac   About an hour ago   3.22GB
+    ```
 
 ---
 
