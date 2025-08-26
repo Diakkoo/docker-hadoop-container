@@ -184,10 +184,10 @@ RUN cat > $HADOOP_HOME/etc/hadoop/mapred-site.xml <<'EOF'
         <value>256</value>
     </property>
 
-    <!-- 设置每个Reduce任务的内存限制为256MB -->
+    <!-- 设置每个Reduce任务的内存限制为512MB -->
     <property>
         <name>mapreduce.reduce.memory.mb</name>
-        <value>762</value>
+        <value>512</value>
     </property>
 
     <property>
@@ -256,19 +256,19 @@ RUN cat > $HADOOP_HOME/etc/hadoop/yarn-site.xml <<'EOF'
         <value>nn:8088</value>
     </property>
     
-    <!-- 每个NodeManager可用的物理内存量设置为1024MB -->
+    <!-- 每个NodeManager可用的物理内存量设置为2048MB -->
     <property>
         <name>yarn.nodemanager.resource.memory-mb</name>
         <value>2048</value>
     </property>
     
-    <!-- 单个容器可申请的最小内存量设置为1024MB -->
+    <!-- 单个容器可申请的最小内存量设置为512MB -->
     <property>
         <name>yarn.scheduler.minimum-allocation-mb</name>
         <value>512</value>
     </property>
     
-    <!-- 单个容器可申请的最大内存量设置为1024MB -->
+    <!-- 单个容器可申请的最大内存量设置为512MB -->
     <property>
         <name>yarn.scheduler.maximum-allocation-mb</name>
         <value>512</value>
